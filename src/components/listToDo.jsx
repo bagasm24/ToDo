@@ -37,10 +37,10 @@ function ListToDo() {
           What's the plan for today?
         </h1>
         <InputToDo />
-        <CategoriesToDo />
+        <CategoriesToDo todos={todos}/>
         <div
           className={`mt-4 ${
-            todos.length > 3 ? "md:grid md:grid-cols-2 md:gap-2" : ""
+            todos.length > 4 ? "md:grid md:grid-cols-2 md:gap-2" : ""
           }`}
         >
           {isLoading ? (

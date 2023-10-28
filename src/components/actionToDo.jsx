@@ -1,12 +1,15 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteToDo } from "../redux/actions/todo-actions";
+import { deleteToDo, editValueToDo } from "../redux/actions/todo-actions";
+import { useState } from "react";
+import { useEffect } from "react";
 
 function ActionToDo({ todo }) {
   const dispatch = useDispatch();
   const { isLoading, todos } = useSelector((state) => state.todo);
+  const [newInput, setNewInput] = useState("");
 
-  const handleOpenModal = (id) => {
+  const handleOpenModalDelete = (id) => {
     const modal = document.getElementById("my_modal_2");
     localStorage.setItem("todoIdToDelete", id);
     modal.showModal();
@@ -14,16 +17,32 @@ function ActionToDo({ todo }) {
 
   const handleDelete = () => {
     const modal = document.getElementById("my_modal_2");
-    const todoId = localStorage.getItem('todoIdToDelete');
+    const todoId = localStorage.getItem("todoIdToDelete");
     modal.close();
     dispatch(deleteToDo(todoId));
-    localStorage.removeItem('todoIdToDelete');
+    localStorage.removeItem("todoIdToDelete");
+  };
+
+  const handleOpenModalEdit = (id) => {
+    const modal = document.getElementById("my_modal_1");
+    localStorage.setItem("todoIdToEditValue", id);
+    modal.showModal();
+  };
+
+  const handleEdit = (e) => {
+    e.preventDefault();
+    const modal = document.getElementById("my_modal_1");
+    const todoId = localStorage.getItem("todoIdToEditValue");
+    modal.close();
+    let value = newInput
+    dispatch(editValueToDo(value, todoId))
+    localStorage.removeItem("todoIdToEditValue");
   };
   return (
     <div className="flex gap-2">
       <button
         className="btn hover:bg-blue-600 text-slate-500 hover:text-white"
-        onClick={() => document.getElementById("my_modal_1").showModal()}
+        onClick={() => handleOpenModalEdit(todo.id)}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -42,14 +61,19 @@ function ActionToDo({ todo }) {
       </button>
       <dialog id="my_modal_1" className="modal">
         <div className="modal-box">
-          <h3 className="font-bold text-lg">Hello!</h3>
-          <p className="py-4">
-            Press ESC key or click the button below to close
-          </p>
+          <h3 className="font-bold text-lg">Edit</h3>
+          <input
+            type="text"
+            value={newInput}
+            onChange={(e) => setNewInput(e.target.value)}
+            className="w-full rounded-sm border-2 border-slate-200 p-2"
+          />
           <div className="modal-action">
             <form method="dialog" className="flex gap-1">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn">Yes, Sure</button>
+              <button className="btn" onClick={handleEdit}>
+                Yes, Sure
+              </button>
               <button className="btn">Close</button>
             </form>
           </div>
@@ -57,7 +81,7 @@ function ActionToDo({ todo }) {
       </dialog>
       <button
         className="btn hover:bg-red-600 text-slate-500 hover:text-white"
-        onClick={() => handleOpenModal(todo.id)}
+        onClick={() => handleOpenModalDelete(todo.id)}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
